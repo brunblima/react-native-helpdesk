@@ -20,10 +20,10 @@ import {
 } from './styles';
 
 interface ImagePickerProps {
-  onSelectImage: (imageUri: string) => void;
-}
-
-const ImagePicker: React.FC<ImagePickerProps> = ({onSelectImage}) => {
+    onSelectImage: (imageUri: string) => void;
+    onRemoveImage: (imageUri: string) => void; // Função para remover uma imagem
+  }
+const ImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveImage}) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const openImagePicker = () => {
@@ -44,7 +44,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({onSelectImage}) => {
         const selectedAsset = response.assets[0];
         const imageUri: string | undefined = selectedAsset.uri;
         if (imageUri) {
-          onSelectImage(imageUri); // Notify parent component
+          onSelectImage(imageUri); 
           setSelectedImages(prevImages => [...prevImages, imageUri]);
         }
       }
@@ -69,7 +69,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({onSelectImage}) => {
         const selectedAsset = response.assets[0];
         const imageUri: string | undefined = selectedAsset.uri;
         if (imageUri) {
-          onSelectImage(imageUri); // Notify parent component
+          onSelectImage(imageUri); 
           setSelectedImages(prevImages => [...prevImages, imageUri]);
         }
       }
@@ -77,9 +77,11 @@ const ImagePicker: React.FC<ImagePickerProps> = ({onSelectImage}) => {
   };
 
   const removeImage = (imageUri: string) => {
-    const updatedImages = selectedImages.filter(img => img !== imageUri);
-    setSelectedImages(updatedImages);
+    const updatedImages = selectedImages.filter((img) => img !== imageUri);
+    setSelectedImages([...updatedImages]);
+    onRemoveImage(imageUri); // Informa o componente pai sobre a remoção da imagem
   };
+
 
   return (
     <>

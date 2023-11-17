@@ -1,11 +1,13 @@
 import styled from 'styled-components/native';
+import { Dimensions } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
-  margin-top: 15px; 
+  margin-top: 10px; 
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 12px;
+  margin-bottom: 10px;
 `;
 
 export const Header = styled.View`
@@ -27,5 +29,15 @@ export const Counter = styled.Text`
   color: ${({ theme }) => theme.COLORS.SUBTEXT};
   margin-bottom: 12px;
   margin-right: 5px;
+`;
+
+export const Background = styled.View`
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ width: ${Dimensions.get('window').width}px;
+ height: ${Dimensions.get('window').height}px;
+ background-color: rgba(0,0,0,0.7);
 `;
 

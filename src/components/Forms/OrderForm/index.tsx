@@ -11,7 +11,7 @@ import ImagePicker from '@components/Image';
 import storage from '@react-native-firebase/storage';
 
 export function OrderForm() {
-  const [patrimony, setPatrimony] = useState('');
+  const [remoteaccess, setRemoteAccess] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedType, setSelectedType] = useState('');
@@ -21,6 +21,7 @@ export function OrderForm() {
   >([]);
   const [devices, setDevices] = useState<{label: string; value: string}[]>([]);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [location, setLocation] = useState('');
 
   const handleNewOrder = async () => {
     setIsLoading(true);
@@ -30,7 +31,6 @@ export function OrderForm() {
       const imageRef = storage().ref(`images/${image}`);
       const response = await imageRef.putFile(image);
   
-      // Aqui, vamos verificar se o envio foi bem-sucedido antes de tentar obter a URL
       if (response.state === 'success') {
         const imageUrl = await imageRef.getDownloadURL();
         imageUrls.push(imageUrl);
@@ -43,8 +43,9 @@ export function OrderForm() {
       .add({
         selectedType,
         devices,
-        patrimony,
+        remoteaccess,
         description,
+        location,
         status: 'open',
         create_at: firestore.FieldValue.serverTimestamp(),
         images: imageUrls, 
@@ -81,6 +82,10 @@ export function OrderForm() {
   const handleImageSelection = (imageUri: string) => {
     setSelectedImages([...selectedImages, imageUri]);
   };
+  const removeImage = (imageUri: string) => {
+    setSelectedImages((prevImages) => prevImages.filter((img) => img !== imageUri));
+  };
+
 
   useEffect(() => {
     (async () => {
@@ -93,6 +98,7 @@ export function OrderForm() {
       }
     })();
   }, [selectedType]);
+
 
   return (
     <Form>
@@ -133,11 +139,13 @@ export function OrderForm() {
         </PickerStyled>
       </PickerContainer>
 
-      <Input placeholder="Número do Patrimônio" onChangeText={setPatrimony} />
+      <Input placeholder="Acesso Remoto"  keyboardType="numeric"  maxLength={10} onChangeText={setRemoteAccess} />
 
       <TextArea placeholder="Descrição" onChangeText={setDescription} />
 
-      <ImagePicker onSelectImage={handleImageSelection} />
+      <Input placeholder="Local/Sala" onChangeText={setLocation} />
+
+      <ImagePicker onSelectImage={handleImageSelection} onRemoveImage={removeImage} />
 
       <Button
         title="Enviar chamado"

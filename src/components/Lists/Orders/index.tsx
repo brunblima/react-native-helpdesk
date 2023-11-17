@@ -8,10 +8,18 @@ import {Filters} from '../../../components/Controllers/Filters';
 import {Order, OrderProps} from '../../Controllers/Order';
 import {Container, Header, Title, Counter} from './styles';
 
-export function Orders() {
+export interface OrdersProps {
+  openModal: (order: OrderProps | null) => void;
+}
+
+export function Orders({openModal}: OrdersProps) {
   const [status, setStatus] = useState('open');
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState<OrderProps[]>([]);
+
+  const handleOrderPress = (order: OrderProps) => {
+    openModal(order);
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -26,6 +34,12 @@ export function Orders() {
             ...doc.data(),
           };
         }) as OrderProps[];
+
+        const sortedData = data.sort((a, b) => {
+          const dateA = new Date(a.create_at).getTime();
+          const dateB = new Date(b.create_at).getTime();
+          return dateA - dateB;
+        });
 
         setOrders(data);
         setIsLoading(false);
@@ -48,9 +62,10 @@ export function Orders() {
         <FlatList
           data={orders}
           keyExtractor={item => item.id}
-          renderItem={({item}) => <Order data={item} />}
-          contentContainerStyle={{paddingBottom: 100}}
-          showsVerticalScrollIndicator={false}
+          renderItem={({item}) => (
+            <Order data={item} onOrderPress={handleOrderPress} />
+          )}
+          showsVerticalScrollIndicator={true}
           style={{flex: 1}}
         />
       )}

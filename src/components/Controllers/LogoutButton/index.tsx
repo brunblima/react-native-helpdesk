@@ -10,7 +10,7 @@ export function LogoutButton({ ...rest }: TouchableOpacityProps) {
 
   return (
     <Container {...rest}>
-      <MaterialIcons name="logout" size={18} color={COLORS.WHITE} />
+      <MaterialIcons name="logout" size={25} color={COLORS.WHITE} />
     </Container>
   )
 }

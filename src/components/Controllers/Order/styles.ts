@@ -4,38 +4,49 @@ export type OrderStyleProps = {
   status: 'open' | 'closed';
 };
 
-export const Container = styled.View`
+export const Container = styled.TouchableOpacity`
   width: 100%;
-  height: 94px;
+  height: 150px;
   flex-direction: row;
   overflow: hidden;
   margin-bottom: 16px;
 `;
 
 export const Content = styled.View`
-  flex: 1;
-  height: 94px;
-  padding: 0 15px;
-  justify-content: center;
+  width: 100%;
+  height: 150px;
+  padding: 5px 10px;
+  justify-content: flex-start;
+  align-items: flex-start;
   background-color: ${({ theme }) => theme.COLORS.WHITE};
-  border-radius: 10px;
+  border-radius: 0 20px 20px 0;
 `;
 
 export const Header = styled.View`
-  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
 `;
 
 export const Status = styled.View<OrderStyleProps>`
   width: 10px;
-  height: 94px;
+  height: 150px;
   background-color: ${({ theme, status }) => status === 'open' ? theme.COLORS.SECONDARY : theme.COLORS.PRIMARY};
 `;
 
 export const Title = styled.Text`
   flex: 1;
-  font-size: 18px;
+  font-size: 16px;
   color: ${({ theme }) => theme.COLORS.TEXT};
-  margin-bottom: 18px;
+  
+`;
+
+export const Body = styled.View`
+ flex-direction: row;
+`
+export const BodyText = styled.Text`
+  font-size: 16px;
+  color: ${({ theme }) => theme.COLORS.TEXT}; 
+  padding-left: 5px ;
 `;
 
 
@@ -48,11 +59,20 @@ export const Footer = styled.View`
   width: 100%;
   justify-content: space-between;
   flex-direction: row;
+  position: absolute;
+  bottom: 0;
+  padding: 5px;
+  
 `;
-
-
 export const Label = styled.Text`
   font-size: 12px;
   color: ${({ theme }) => theme.COLORS.SUBTEXT};  
   margin-left: 3px;
+`;
+
+export const IconWrapper = styled.View`
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 15px;
 `;

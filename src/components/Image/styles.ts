@@ -28,8 +28,8 @@ export const RemoveButton = styled(TouchableOpacity)`
   right: -7px;
   background-color: rgba(255, 0, 0, 0.7);
   border-radius: 50px;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   
 `;
 

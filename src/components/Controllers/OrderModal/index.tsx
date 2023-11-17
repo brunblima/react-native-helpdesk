@@ -7,7 +7,15 @@ import {
 } from '@gorhom/bottom-sheet';
 import {View, Image} from 'react-native';
 import {OrderProps} from '../Order';
-import {Text} from './styles';
+import {
+  Text,
+  ImageThumbnail,
+  ThumbnailImage,
+  FullScreenModal,
+  FullScreenView,
+  FullScreenImage,
+  ModalContainer
+} from './styles';
 
 export interface OrderModalProps {
   order: OrderProps | null;
@@ -17,6 +25,15 @@ export interface OrderModalProps {
 const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const [selectedOrder, setSelectedOrder] = useState<OrderProps | null>(order);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const openImageFullSize = (image: string) => {
+    setSelectedImage(image);
+  };
+
+  const closeImageFullSize = () => {
+    setSelectedImage(null);
+  };
 
   const handleCloseModal = () => {
     setSelectedOrder(null);
@@ -56,13 +73,21 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
                   selectedOrder.create_at._seconds * 1000,
                 ).toLocaleString()}
               </Text>
-              {selectedOrder.images.map((image, index) => (
-                <Image
-                  key={index}
-                  source={{uri: image}}
-                  style={{width: 200, height: 200}}
-                />
-              ))}
+              <ModalContainer>
+        {order?.images.map((image, index) => (
+          <ImageThumbnail key={index} onPress={() => openImageFullSize(image)}>
+            <ThumbnailImage source={{ uri: image }} />
+          </ImageThumbnail>
+        ))}
+
+        {/* Modal para exibir a imagem em tela cheia */}
+        <FullScreenModal visible={selectedImage !== null} transparent={true} onRequestClose={closeImageFullSize}>
+          <FullScreenView>
+            {/* Renderize a imagem em tela cheia */}
+            {selectedImage && <FullScreenImage source={{ uri: selectedImage }} resizeMode="contain" />}
+          </FullScreenView>
+        </FullScreenModal>
+      </ModalContainer>
             </>
           )}
         </View>

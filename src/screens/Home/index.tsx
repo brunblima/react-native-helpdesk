@@ -28,10 +28,10 @@ export function Home({ }: HomeProps) {
     <Container>
       <Header />
       <Orders openModal={handleOpenModal} />
+      <NewOrder />
       {isModalVisible && (
         <OrderModal order={selectedOrder} setIsModalVisible={handleCloseModal} />
       )}
-      <NewOrder />
     </Container>
   );
 }

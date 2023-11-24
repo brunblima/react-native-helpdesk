@@ -17,7 +17,6 @@ export function SignInForm() {
   const navigation = useNavigation();
 
   function isEmailValid(email:string) {
-    // Expressão regular para validar e-mails simples
     const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
   }

@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 
-import firestore from '@react-native-firebase/firestore';
-import {Alert, View, Image} from 'react-native';
+import {Alert, ScrollView} from 'react-native';
 import {Form, Title, PickerStyled, PickerContainer} from './styles';
 import {Input} from '../../Controllers/Input';
 import {Button} from '../../Controllers/Button';
@@ -9,6 +8,8 @@ import {TextArea} from '../../Controllers/TextArea';
 import {Picker} from '@react-native-picker/picker';
 import ImagePicker from '@components/Image';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 export function OrderForm() {
   const [remoteaccess, setRemoteAccess] = useState('');
@@ -26,11 +27,17 @@ export function OrderForm() {
   const handleNewOrder = async () => {
     setIsLoading(true);
 
+    const user = auth().currentUser;
+
+    if (user) {
+      const userId = user.uid;
+    
+
     const imageUrls = [];
     for (const image of selectedImages) {
       const imageRef = storage().ref(`images/${image}`);
       const response = await imageRef.putFile(image);
-  
+
       if (response.state === 'success') {
         const imageUrl = await imageRef.getDownloadURL();
         imageUrls.push(imageUrl);
@@ -48,12 +55,14 @@ export function OrderForm() {
         location,
         status: 'open',
         create_at: firestore.FieldValue.serverTimestamp(),
-        images: imageUrls, 
+        images: imageUrls,
+        createdBy: userId,
       })
       .then(() => Alert.alert('Chamado', 'Chamado aberto com sucesso!'))
       .catch(error => console.log(error))
       .finally(() => setIsLoading(false));
   };
+}
 
   const getDeviceTypeData = async () => {
     const deviceTypeCollection = firestore().collection('deviceType');
@@ -83,9 +92,8 @@ export function OrderForm() {
     setSelectedImages([...selectedImages, imageUri]);
   };
   const removeImage = (imageUri: string) => {
-    setSelectedImages((prevImages) => prevImages.filter((img) => img !== imageUri));
+    setSelectedImages(prevImages => prevImages.filter(img => img !== imageUri));
   };
-
 
   useEffect(() => {
     (async () => {
@@ -99,59 +107,68 @@ export function OrderForm() {
     })();
   }, [selectedType]);
 
-
   return (
-    <Form>
-      <Title>Novo chamado</Title>
+    <ScrollView contentContainerStyle={{paddingBottom: 100}}>
+      <Form>
+        <Title>Novo chamado</Title>
 
-      <PickerContainer>
-        <PickerStyled
-          dropdownIconColor={'#000'}
-          style={{color: '#000'}}
-          selectedValue={selectedType}
-          onValueChange={(itemValue, itemIndex) => {
-            setSelectedType(itemValue as string);
-            setDevices([]);
-            setSelectedDevice('');
-          }}>
-          <Picker.Item
-            label={'Nenhum tipo de dispositvo selecionado'}
-            value={''}
-          />
-          {deviceType.map((item, index) => (
-            <Picker.Item key={index} label={item.label} value={item.value} />
-          ))}
-        </PickerStyled>
-      </PickerContainer>
+        <PickerContainer>
+          <PickerStyled
+            dropdownIconColor={'#000'}
+            style={{color: '#000'}}
+            selectedValue={selectedType}
+            onValueChange={(itemValue, itemIndex) => {
+              setSelectedType(itemValue as string);
+              setDevices([]);
+              setSelectedDevice('');
+            }}>
+            <Picker.Item
+              label={'Nenhum tipo de dispositvo selecionado'}
+              value={''}
+            />
+            {deviceType.map((item, index) => (
+              <Picker.Item key={index} label={item.label} value={item.value} />
+            ))}
+          </PickerStyled>
+        </PickerContainer>
 
-      <PickerContainer>
-        <PickerStyled
-          dropdownIconColor={'#000'}
-          style={{color: '#000'}}
-          selectedValue={selecteDevice}
-          onValueChange={(itemValue, itemIndex) => {
-            setSelectedDevice(itemValue as string);
-          }}>
-          <Picker.Item label={'Nenhum dispositivo selecionado'} value={''} />
-          {devices.map((item, index) => (
-            <Picker.Item key={index} label={item.label} value={item.value} />
-          ))}
-        </PickerStyled>
-      </PickerContainer>
+        <PickerContainer>
+          <PickerStyled
+            dropdownIconColor={'#000'}
+            style={{color: '#000'}}
+            selectedValue={selecteDevice}
+            onValueChange={(itemValue, itemIndex) => {
+              setSelectedDevice(itemValue as string);
+            }}>
+            <Picker.Item label={'Nenhum dispositivo selecionado'} value={''} />
+            {devices.map((item, index) => (
+              <Picker.Item key={index} label={item.label} value={item.value} />
+            ))}
+          </PickerStyled>
+        </PickerContainer>
 
-      <Input placeholder="Acesso Remoto"  keyboardType="numeric"  maxLength={10} onChangeText={setRemoteAccess} />
+        <Input
+          placeholder="Acesso Remoto"
+          keyboardType="numeric"
+          maxLength={10}
+          onChangeText={setRemoteAccess}
+        />
 
-      <TextArea placeholder="Descrição" onChangeText={setDescription} />
+        <TextArea placeholder="Descrição" onChangeText={setDescription} />
 
-      <Input placeholder="Local/Sala" onChangeText={setLocation} />
+        <Input placeholder="Local/Sala" onChangeText={setLocation} />
 
-      <ImagePicker onSelectImage={handleImageSelection} onRemoveImage={removeImage} />
+        <ImagePicker
+          onSelectImage={handleImageSelection}
+          onRemoveImage={removeImage}
+        />
 
-      <Button
-        title="Enviar chamado"
-        isLoading={isLoading}
-        onPress={handleNewOrder}
-      />
-    </Form>
+        <Button
+          title="Enviar chamado"
+          isLoading={isLoading}
+          onPress={handleNewOrder}
+        />
+      </Form>
+    </ScrollView>
   );
 }

@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 
 export type OrderStyleProps = {
-  status: 'open' | 'closed';
+  status: 'open' | 'closed' | 'in_progress';
 };
 
 export const Container = styled.TouchableOpacity`

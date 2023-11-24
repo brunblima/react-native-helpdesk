@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from './styles';
 import { Header } from '../../components/Layout/Header';
 import { Orders } from '../../components/Lists/Orders';
@@ -23,6 +23,7 @@ export function Home({ }: HomeProps) {
     setSelectedOrder(null);
     setIsModalVisible(false);
   };
+
 
   return (
     <Container>

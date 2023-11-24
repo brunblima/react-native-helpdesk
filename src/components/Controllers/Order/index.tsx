@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTheme} from 'styled-components/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import firestore from '@react-native-firebase/firestore';
 
 import {
   Container,
@@ -20,15 +21,16 @@ import {
 
 export interface OrderProps {
   id: string;
-  status: 'open' | 'closed';
+  status: 'open' | 'closed' | 'in_progress';
   selectedType: string;
-  devices: { label: string; value: string }[];
+  devices: {label: string; value: string}[];
   remoteaccess: string;
   location: string;
-  equipment: string;
   description: string;
   create_at: any;
   images: string[];
+  createdBy: string;
+  userId: string;
 }
 
 type Props = {
@@ -36,31 +38,78 @@ type Props = {
   onOrderPress: (order: OrderProps) => void;
 };
 
-export function Order({data, onOrderPress }: Props) {
+export function Order({data, onOrderPress}: Props) {
   const theme = useTheme();
-  const formattedDate = data.create_at.toDate().toLocaleString();
+  const formattedDate = data.create_at
+    ? data.create_at.toDate().toLocaleString()
+    : 'Data indisponível';
   const deviceValues = data.devices.map(device => device.value);
-  
+
   const handleOrderPress = () => {
     onOrderPress(data);
   };
+  const [creatorUsername, setCreatorUsername] = useState<string>('');
 
-  
+  useEffect(() => {
+    const fetchCreatorUsername = async () => {
+      try {
+        const userSnapshot = await firestore()
+          .collection('users')
+          .doc(data.createdBy)
+          .get();
+
+        if (userSnapshot.exists) {
+          const userData = userSnapshot.data();
+          if (userData && userData.username) {
+            setCreatorUsername(userData.username);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar o nome do usuário:', error);
+      }
+    };
+
+    fetchCreatorUsername();
+  }, [data.createdBy]);
+
+  const renderIcon = () => {
+    switch (data.status) {
+      case 'open':
+        return (
+          <MaterialIcons
+            name="hourglass-empty"
+            size={24}
+            color={theme.COLORS.SECONDARY}
+          />
+        );
+      case 'closed':
+        return (
+          <MaterialIcons
+            name="check-circle"
+            size={24}
+            color={theme.COLORS.PRIMARY}
+          />
+        );
+      case 'in_progress':
+        return (
+          <MaterialCommunityIcons
+            name="progress-clock"
+            size={24}
+            color={theme.COLORS.PRIMARY}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Container onPress={() => onOrderPress(data)}>
       <Status status={data.status} />
       <Content>
-        <IconWrapper>
-          <MaterialIcons
-            name={data.status === 'open' ? 'hourglass-empty' : 'check-circle'}
-            size={24}
-            color={
-              data.status === 'open'
-                ? theme.COLORS.SECONDARY
-                : theme.COLORS.PRIMARY
-            }
-          />
-        </IconWrapper>
+      <IconWrapper>
+        {renderIcon()}
+      </IconWrapper>
         <Body>
           <MaterialIcons
             name="devices-other"
@@ -103,7 +152,7 @@ export function Order({data, onOrderPress }: Props) {
           ))}
         </Body>
         <Body>
-          {data.remoteaccess && ( // Verifica se data.remoteaccess não está vazio
+          {data.remoteaccess && (
             <>
               <MaterialCommunityIcons
                 name="remote-desktop"
@@ -122,20 +171,31 @@ export function Order({data, onOrderPress }: Props) {
         <Footer>
           <Info>
             <MaterialIcons
+              name="person"
+              size={16}
+              color={theme.COLORS.SUBTEXT}
+            />
+            <Label>{creatorUsername}</Label>
+          </Info>
+
+          {data.location !== '' && (
+            <Info>
+              <MaterialIcons
+                name="my-location"
+                size={16}
+                color={theme.COLORS.SUBTEXT}
+              />
+              <Label>{data.location}</Label>
+            </Info>
+          )}
+
+          <Info>
+            <MaterialIcons
               name="schedule"
               size={16}
               color={theme.COLORS.SUBTEXT}
             />
             <Label>{formattedDate}</Label>
-          </Info>
-
-          <Info>
-            <MaterialIcons
-              name="my-location"
-              size={16}
-              color={theme.COLORS.SUBTEXT}
-            />
-            <Label>{data.location}</Label>
           </Info>
         </Footer>
       </Content>

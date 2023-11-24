@@ -11,7 +11,7 @@ export const Container = styled.View`
 
 export const ImageContainer = styled.View`
   position: relative;
-  margin-right: 10px;
+  padding: 5px;
 `;
 
 export const Image = styled.Image`

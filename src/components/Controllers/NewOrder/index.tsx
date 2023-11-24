@@ -18,12 +18,17 @@ export function NewOrder() {
 
   return (
     <>
-      <Button title="Novo chamado" onPress={handleSnapPress} />
+      <Button
+        title="Novo chamado"
+        onPress={handleSnapPress}
+        style={{width: '95%', margin: 10}}
+      />
 
       <BottomSheetModalProvider>
         <BottomSheetModal
+          enableContentPanningGesture={false}
           ref={bottomSheetRef}
-          snapPoints={['88%', '50%', '100%']}
+          snapPoints={['88%', '100%']}
           style={{padding: 24}}
           enablePanDownToClose={true}
           backdropComponent={() => <Background />}>

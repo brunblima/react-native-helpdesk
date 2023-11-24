@@ -13,35 +13,45 @@ export const Background = styled.View`
 
 export const Text = styled.Text`
   color: #121212;
+  font-weight: 400;
 `;
+
 export const ImageThumbnail = styled.TouchableOpacity`
-  margin-bottom: 10px;
   padding: 5px;
 `;
 
 export const ThumbnailImage = styled.Image`
   width: 100px;
   height: 100px;
+  border-radius: 20px;
 `;
 
-export const FullScreenModal = styled.Modal``; // Estilos do modal em tela cheia
+export const FullScreenModal = styled.Modal`
 
-export const FullScreenView = styled.TouchableOpacity`
-  /* Estilos da view em tela cheia */
+`;
+
+export const FullScreenView = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: black;
+ 
 `;
 
 export const FullScreenImage = styled.Image`
-  /* Estilos da imagem em tela cheia */
   width: 100%;
   height: 100%;
+  
 `;
+
 export const ModalContainer = styled.View`
-  flex: 1;
-  background-color: rgba(0, 0, 0, 0.5);
+  margin-top: 5px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.COLORS.BORDER};
+  flex-wrap: wrap;
+  flex-direction: row;
+  border-radius: 20px;
   justify-content: center;
-  align-items: center;
+  height: auto;
+  width: 100%;
+
 `;

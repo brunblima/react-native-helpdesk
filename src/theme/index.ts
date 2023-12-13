@@ -4,6 +4,7 @@ export default {
 
     PRIMARY: '#6100FF',
     SECONDARY: '#FF366A',
+    TERTIARY: '#008b34',
 
     TEXT: '#383B43',
     SUBTEXT: '#8D919E',

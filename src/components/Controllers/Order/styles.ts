@@ -30,7 +30,17 @@ export const Header = styled.View`
 export const Status = styled.View<OrderStyleProps>`
   width: 10px;
   height: 150px;
-  background-color: ${({ theme, status }) => status === 'open' ? theme.COLORS.SECONDARY : theme.COLORS.PRIMARY};
+  background-color: ${({ theme, status }) => {
+    switch (status) {
+      case 'open':
+        return theme.COLORS.SECONDARY;
+      case 'closed':
+        return theme.COLORS.PRIMARY;
+      case 'in_progress':
+        return theme.COLORS.TERTIARY;
+    }
+  }};
+
 `;
 
 export const Title = styled.Text`

@@ -11,7 +11,7 @@ export function Header() {
   return (
     <Container>
       <Greeting>
-        <Title>Helpdesk</Title>
+        <Title>Central de Ajuda</Title>
       </Greeting>
       <LogoutButton onPress={handleSignOut} />
     </Container>

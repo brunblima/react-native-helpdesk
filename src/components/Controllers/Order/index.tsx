@@ -23,11 +23,14 @@ export interface OrderProps {
   id: string;
   status: 'open' | 'closed' | 'in_progress';
   selectedType: string;
+  selectedDevice: string;
+  selectedSector: string;
   devices: {label: string; value: string}[];
   remoteaccess: string;
   location: string;
   description: string;
   create_at: any;
+  closed_at: any;
   images: string[];
   createdBy: string;
   userId: string;
@@ -43,7 +46,6 @@ export function Order({data, onOrderPress}: Props) {
   const formattedDate = data.create_at
     ? data.create_at.toDate().toLocaleString()
     : 'Data indisponível';
-  const deviceValues = data.devices.map(device => device.value);
 
   const handleOrderPress = () => {
     onOrderPress(data);
@@ -95,7 +97,7 @@ export function Order({data, onOrderPress}: Props) {
           <MaterialCommunityIcons
             name="progress-clock"
             size={24}
-            color={theme.COLORS.PRIMARY}
+            color={theme.COLORS.TERTIARY}
           />
         );
       default:
@@ -147,10 +149,9 @@ export function Order({data, onOrderPress}: Props) {
               />
             </>
           )}
-          {deviceValues.map((value, index) => (
-            <BodyText key={index}>{value}</BodyText>
-          ))}
+          <BodyText>{data.selectedDevice}</BodyText>
         </Body>
+            
         <Body>
           {data.remoteaccess && (
             <>
@@ -164,7 +165,7 @@ export function Order({data, onOrderPress}: Props) {
           )}
         </Body>
 
-        <Body>
+        <Body style={{padding: 3}}>
           <Title>{data.description}</Title>
         </Body>
 

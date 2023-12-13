@@ -16,6 +16,7 @@ export const Greeting = styled.View`
 export const Title = styled.Text`
   font-size: 24px;
   color: ${({ theme }) => theme.COLORS.TEXT};
+  padding-left:  10px;
 `;
 
 export const SubTitle = styled.Text`

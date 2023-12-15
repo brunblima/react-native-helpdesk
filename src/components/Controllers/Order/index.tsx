@@ -25,6 +25,7 @@ export interface OrderProps {
   selectedType: string;
   selectedDevice: string;
   selectedSector: string;
+  typeService: string;
   devices: {label: string; value: string}[];
   remoteaccess: string;
   location: string;
@@ -109,66 +110,75 @@ export function Order({data, onOrderPress}: Props) {
     <Container onPress={() => onOrderPress(data)}>
       <Status status={data.status} />
       <Content>
-      <IconWrapper>
-        {renderIcon()}
-      </IconWrapper>
-        <Body>
-          <MaterialIcons
-            name="devices-other"
-            size={20}
-            color={theme.COLORS.SUBTEXT}
-          />
-          <BodyText>{data.selectedType}</BodyText>
-        </Body>
-        <Body>
-          {data.selectedType === 'Impressora' && (
-            <>
-              <MaterialIcons
-                name="print"
-                size={20}
-                color={theme.COLORS.SUBTEXT}
-              />
-            </>
-          )}
+        <IconWrapper>{renderIcon()}</IconWrapper>
 
-          {data.selectedType === 'Computador' && (
-            <>
-              <MaterialIcons
-                name="computer"
-                size={20}
-                color={theme.COLORS.SUBTEXT}
-              />
-            </>
-          )}
-          {data.selectedType === 'Celular' && (
-            <>
-              <MaterialIcons
-                name="smartphone"
-                size={20}
-                color={theme.COLORS.SUBTEXT}
-              />
-            </>
-          )}
-          <BodyText>{data.selectedDevice}</BodyText>
-        </Body>
-            
         <Body>
-          {data.remoteaccess && (
-            <>
-              <MaterialCommunityIcons
-                name="remote-desktop"
-                size={20}
-                color={theme.COLORS.SUBTEXT}
-              />
-              <BodyText>{data.remoteaccess}</BodyText>
-            </>
-          )}
+          <BodyText style={{ fontWeight: 'bold' }}>{data.typeService}</BodyText>
         </Body>
+
+        {data.typeService !== 'Outros' && (
+          <Body>
+            <MaterialIcons
+              name="devices-other"
+              size={20}
+              color={theme.COLORS.SUBTEXT}
+            />
+            <BodyText>{data.selectedType}</BodyText>
+          </Body>
+        )}
+
+        {data.typeService !== 'Outros' && (
+          <Body>
+            {data.selectedType === 'Impressora' && (
+              <>
+                <MaterialIcons
+                  name="print"
+                  size={20}
+                  color={theme.COLORS.SUBTEXT}
+                />
+              </>
+            )}
+
+            {data.selectedType === 'Computador' && (
+              <>
+                <MaterialIcons
+                  name="computer"
+                  size={20}
+                  color={theme.COLORS.SUBTEXT}
+                />
+              </>
+            )}
+            {data.selectedType === 'Celular' && (
+              <>
+                <MaterialIcons
+                  name="smartphone"
+                  size={20}
+                  color={theme.COLORS.SUBTEXT}
+                />
+              </>
+            )}
+            <BodyText>{data.selectedDevice}</BodyText>
+          </Body>
+        )}
+
+        {data.typeService !== 'Outros' && (
+          <Body>
+            {data.remoteaccess && (
+              <>
+                <MaterialCommunityIcons
+                  name="remote-desktop"
+                  size={20}
+                  color={theme.COLORS.SUBTEXT}
+                />
+                <BodyText>{data.remoteaccess}</BodyText>
+              </>
+            )}
+          </Body>
+        )}
 
         <Body style={{padding: 3}}>
           <Title>{data.description}</Title>
         </Body>
-
         <Footer>
           <Info>
             <MaterialIcons

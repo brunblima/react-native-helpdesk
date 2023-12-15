@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -6,15 +6,15 @@ import firestore from '@react-native-firebase/firestore';
 import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import { View } from 'react-native';
-import { OrderProps } from '../Order';
+import {View} from 'react-native';
+import {OrderProps} from '../Order';
 import {
   Text,
   ImageThumbnail,
@@ -25,14 +25,14 @@ import {
   ModalContainer,
 } from './styles';
 import Swiper from 'react-native-swiper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 
 export interface OrderModalProps {
   order: OrderProps | null;
   setIsModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => {
+const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderProps | null>(order);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -43,7 +43,11 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
     null,
   );
 
-  const sendNotification = async (userId: string, title: string, body: string) => {
+  const sendNotification = async (
+    userId: string,
+    title: string,
+    body: string,
+  ) => {
     try {
       // Encontrar o FCMToken do usuário na coleção 'users'
       const userDoc = await firestore().collection('users').doc(userId).get();
@@ -105,12 +109,19 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
 
     try {
       // Alterar o status da ordem para 'in_progress'
-      await firestore().collection('orders').doc(selectedOrder?.id).update({ status: 'in_progress' });
+      await firestore()
+        .collection('orders')
+        .doc(selectedOrder?.id)
+        .update({status: 'in_progress'});
 
       setIsLoading(false);
       updateButtonStatus('in_progress');
-      await sendNotification(selectedOrder?.createdBy || '', 'Chamado em Andamento', 'Fique atento, pois podemos solicitar acesso remoto à sua máquina.');
-      handleCloseModal()
+      await sendNotification(
+        selectedOrder?.createdBy || '',
+        'Chamado em Andamento',
+        'Fique atento, pois podemos solicitar acesso remoto à sua máquina.',
+      );
+      handleCloseModal();
     } catch (error) {
       setIsLoading(false);
       console.error('Erro ao processar ação:', error);
@@ -121,15 +132,21 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
     setIsLoading(true);
 
     try {
-
       const now = new Date();
 
-      await firestore().collection('orders').doc(selectedOrder?.id).update({ status: 'closed', closed_at: now });
+      await firestore()
+        .collection('orders')
+        .doc(selectedOrder?.id)
+        .update({status: 'closed', closed_at: now});
 
       setIsLoading(false);
       updateButtonStatus('closed');
-      handleCloseModal()
-      await sendNotification(selectedOrder?.createdBy || '', 'Chamado Encerrado', 'O chamado foi encerrado.');
+      handleCloseModal();
+      await sendNotification(
+        selectedOrder?.createdBy || '',
+        'Chamado Encerrado',
+        'O chamado foi encerrado.',
+      );
     } catch (error) {
       setIsLoading(false);
       console.error('Erro ao processar ação:', error);
@@ -143,7 +160,6 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
       handleCloseOrder();
     }
   };
-
 
   const openImageFullSize = (index: number) => {
     setSelectedImageIndex(index);
@@ -200,48 +216,61 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
         snapPoints={['80%', '50%', '100%']}
         backdropComponent={BottomSheetBackdrop}
         onDismiss={handleCloseModal}>
-        <View style={{ padding: 20 }}>
+        <View style={{padding: 20}}>
           {selectedOrder && (
             <>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Status: </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'bold'}}>Status: </Text>
                 <Text>{statusTranslation[selectedOrder.status]}</Text>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Tipo do Dispositivo: </Text>
-                <Text>{selectedOrder.selectedType}</Text>
-              </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Setor: </Text>
+              {selectedOrder.selectedType !== '' && (
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>
+                    Tipo do Dispositivo:{' '}
+                  </Text>
+                  <Text>{selectedOrder.selectedType}</Text>
+                </View>
+              )}
+
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'bold'}}>Setor: </Text>
                 <Text>{selectedOrder.selectedSector}</Text>
               </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Dispositivo: </Text>
-                <Text>{selectedOrder.selectedDevice}</Text>
-              </View>
+              {selectedOrder.selectedDevice !== '' && (
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>Dispositivo: </Text>
+                  <Text>{selectedOrder.selectedDevice}</Text>
+                </View>
+              )}
 
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Acesso Remoto: </Text>
-                <Text>{selectedOrder.remoteaccess}</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                <Text style={{ fontWeight: 'bold' }}>Descrição: </Text>
+              {selectedOrder.remoteaccess !== '' && (
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>Acesso Remoto: </Text>
+                  <Text>{selectedOrder.remoteaccess}</Text>
+                </View>
+              )}
 
-                <View style={{ flex: 1 }}>
-                  <Text style={{ flexWrap: 'wrap' }}>
+              <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                <Text style={{fontWeight: 'bold'}}>Descrição: </Text>
+
+                <View style={{flex: 1}}>
+                  <Text style={{flexWrap: 'wrap'}}>
                     {selectedOrder.description}
                   </Text>
                 </View>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Local: </Text>
+
+              {selectedOrder.selectedType !== '' && (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'bold'}}>Local: </Text>
                 <Text>{selectedOrder.location}</Text>
               </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Aberto em: </Text>
+              )}
+              
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'bold'}}>Aberto em: </Text>
                 <Text>
                   {new Date(
                     selectedOrder.create_at._seconds * 1000,
@@ -249,18 +278,18 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
                 </Text>
               </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontWeight: 'bold' }}>Encerrado em: </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{fontWeight: 'bold'}}>Encerrado em: </Text>
                 <Text>
                   {selectedOrder.closed_at
                     ? new Date(
-                      selectedOrder.closed_at._seconds * 1000
-                    ).toLocaleString()
+                        selectedOrder.closed_at._seconds * 1000,
+                      ).toLocaleString()
                     : 'Não encerrado ainda'}
                 </Text>
               </View>
 
-              <Text style={{ fontSize: 16, fontWeight: 'bold', marginTop: 20 }}>
+              <Text style={{fontSize: 16, fontWeight: 'bold', marginTop: 20}}>
                 Imagens anexadas
               </Text>
               <ModalContainer>
@@ -268,7 +297,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
                   <ImageThumbnail
                     key={index}
                     onPress={() => openImageFullSize(index)}>
-                    <ThumbnailImage source={{ uri: image }} />
+                    <ThumbnailImage source={{uri: image}} />
                   </ImageThumbnail>
                 ))}
                 <FullScreenModal
@@ -277,16 +306,16 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
                   onRequestClose={closeImageFullSize}>
                   <FullScreenView>
                     <Swiper
-                      style={{ height: '100%' }}
+                      style={{height: '100%'}}
                       index={selectedImageIndex || 0}
                       loop={false}
                       onIndexChanged={index => setSelectedImageIndex(index)}>
                       {order?.images.map((image, index) => (
                         <View key={index}>
                           <FullScreenImage
-                            source={{ uri: image }}
+                            source={{uri: image}}
                             resizeMode="contain"
-                            style={{ width: '100%', height: '100%' }}
+                            style={{width: '100%', height: '100%'}}
                           />
                         </View>
                       ))}
@@ -296,7 +325,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ order, setIsModalVisible }) => 
               </ModalContainer>
 
               {isAdmin && (
-                <View style={{ marginTop: '40%' }}>
+                <View style={{marginTop: '40%'}}>
                   <Button
                     title={actionButtonText}
                     isLoading={isLoading}

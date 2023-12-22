@@ -1,5 +1,6 @@
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCyVKFpNge_HGfkwX-bShpCepQjhcrvrB8",
@@ -14,4 +15,17 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
+// Certifique-se de que messaging() esteja disponível antes de usá-lo
+if (messaging()) {
+  messaging()
+    .registerDeviceForRemoteMessages()
+    .then(() => {
+      console.log('Dispositivo registrado para mensagens remotas');
+    })
+    .catch((error) => {
+      console.error('Erro ao registrar o dispositivo para mensagens remotas:', error);
+    });
+}
+
+export { messaging };
 export default firebase;

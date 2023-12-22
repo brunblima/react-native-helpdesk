@@ -2,11 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-
-import messaging, {
-  FirebaseMessagingTypes,
-} from '@react-native-firebase/messaging';
-import notifee, {AndroidImportance} from '@notifee/react-native';
+import {messaging} from '../../../services/firebaseConfig';
 
 import {
   BottomSheetModal,
@@ -42,24 +38,23 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
   );
-
+ 
   const sendNotification = async (
-    userId: string,
+    createdBy: string,
     title: string,
     body: string,
   ) => {
     try {
       // Encontrar o FCMToken do usuário na coleção 'users'
-      const userDoc = await firestore().collection('users').doc(userId).get();
+      const userDoc = await firestore().collection('users').doc(createdBy).get();
       const userData = userDoc.data();
-      const userToken = userData?.fcmToken;
+      const userToken = 'userData?.fcmToken';
 
       if (!userToken) {
         console.error('Token FCM não encontrado para o usuário');
         return;
       }
-
-      // Montar a mensagem para enviar a notificação
+      
       const message = {
         data: {
           title: title,
@@ -74,22 +69,12 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
           },
         },
         fcmOptions: {},
+        
       };
 
       // Enviar a mensagem
       await messaging().sendMessage(message);
-
-      // Exibir notificação local
-      await notifee.displayNotification({
-        title: title,
-        body: body,
-        android: {
-          channelId: 'default_channel_id',
-          importance: AndroidImportance.HIGH,
-          sound: 'default',
-        },
-      });
-
+      
       console.log('Notificação enviada com sucesso!');
     } catch (error) {
       console.error('Erro ao enviar a notificação:', error);
@@ -113,7 +98,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         .collection('orders')
         .doc(selectedOrder?.id)
         .update({status: 'in_progress'});
-
+      handleCloseModal();
       setIsLoading(false);
       updateButtonStatus('in_progress');
       await sendNotification(
@@ -121,7 +106,6 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         'Chamado em Andamento',
         'Fique atento, pois podemos solicitar acesso remoto à sua máquina.',
       );
-      handleCloseModal();
     } catch (error) {
       setIsLoading(false);
       console.error('Erro ao processar ação:', error);
@@ -138,10 +122,9 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         .collection('orders')
         .doc(selectedOrder?.id)
         .update({status: 'closed', closed_at: now});
-
+      handleCloseModal();
       setIsLoading(false);
       updateButtonStatus('closed');
-      handleCloseModal();
       await sendNotification(
         selectedOrder?.createdBy || '',
         'Chamado Encerrado',
@@ -189,7 +172,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
       updateButtonStatus(order.status);
     }
   }, [order]);
-
+  
   useEffect(() => {
     const user = auth().currentUser;
     if (user) {
@@ -263,12 +246,12 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
               </View>
 
               {selectedOrder.selectedType !== '' && (
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontWeight: 'bold'}}>Local: </Text>
-                <Text>{selectedOrder.location}</Text>
-              </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>Local: </Text>
+                  <Text>{selectedOrder.location}</Text>
+                </View>
               )}
-              
+
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={{fontWeight: 'bold'}}>Aberto em: </Text>
                 <Text>

@@ -113,11 +113,11 @@ export function Order({data, onOrderPress}: Props) {
         <IconWrapper>{renderIcon()}</IconWrapper>
 
         <Body>
-          <BodyText style={{ fontWeight: 'bold' }}>{data.typeService}</BodyText>
+          <BodyText style={{fontWeight: 'bold', paddingLeft:1}}>{data.typeService}</BodyText>
         </Body>
 
         {data.typeService !== 'Outros' && (
-          <Body>
+          <Body style={{paddingLeft: 2}}>
             <MaterialIcons
               name="devices-other"
               size={20}
@@ -128,7 +128,7 @@ export function Order({data, onOrderPress}: Props) {
         )}
 
         {data.typeService !== 'Outros' && (
-          <Body>
+          <Body style={{paddingLeft: 2}}>
             {data.selectedType === 'Impressora' && (
               <>
                 <MaterialIcons
@@ -162,7 +162,7 @@ export function Order({data, onOrderPress}: Props) {
         )}
 
         {data.typeService !== 'Outros' && (
-          <Body>
+          <Body style={{paddingLeft: 2}}>
             {data.remoteaccess && (
               <>
                 <MaterialCommunityIcons

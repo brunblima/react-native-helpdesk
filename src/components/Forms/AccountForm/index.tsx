@@ -65,6 +65,7 @@ export function AccountForm() {
           <MaterialIcons
             name={showPassword ? 'visibility-off' : 'visibility'}
             size={26}
+            color={'#000'}
           />
         </TouchableOpacity>
       </View>
@@ -81,6 +82,7 @@ export function AccountForm() {
           <MaterialIcons
             name={showConfirmPassword ? 'visibility-off' : 'visibility'}
             size={26}
+            color={'#000'}
           />
         </TouchableOpacity>
       </View>

@@ -40,14 +40,12 @@ export const Status = styled.View<OrderStyleProps>`
         return theme.COLORS.TERTIARY;
     }
   }};
-
 `;
 
 export const Title = styled.Text`
   flex: 1;
   font-size: 16px;
   color: ${({ theme }) => theme.COLORS.TEXT};
-  
 `;
 
 export const Body = styled.View`
@@ -56,9 +54,8 @@ export const Body = styled.View`
 export const BodyText = styled.Text`
   font-size: 16px;
   color: ${({ theme }) => theme.COLORS.TEXT}; 
-  padding-left: 5px ;
+  padding-left: 4px;
 `;
-
 
 export const Info = styled.View`
   flex-direction: row;

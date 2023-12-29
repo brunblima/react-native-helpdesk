@@ -2,14 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {messaging} from '../../../services/firebaseConfig';
+import messaging from '@react-native-firebase/messaging'
 
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import {View} from 'react-native';
+import {View, PermissionsAndroid, Platform, useColorScheme} from 'react-native';
 import {OrderProps} from '../Order';
 import {
   Text,
@@ -38,42 +38,65 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
   );
- 
+  const FIREBASE_SERVER_KEY =
+  'AAAAW-_lWzY:APA91bHBW7k6KrtyUkDh0qTU_t8lOk5VrSXIf004EHDUDwsw6faJ0QP6bHvwMQfqen70PbY1S5e57bGIOLUM88V1TDRVgdnwi8Up5GKh77sD5dB_JBwBfreRbpizo-y7kv5QHAL-BxTf';
+  
+  function requestAndroidPermission() {
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+  }
+  async function requestUserPermission() {
+    const authorizationStatus = await messaging().requestPermission();
+  
+    if (authorizationStatus) {
+      console.log('Permission status:', authorizationStatus);
+    }
+  }
+
   const sendNotification = async (
     createdBy: string,
     title: string,
     body: string,
   ) => {
     try {
-      // Encontrar o FCMToken do usuário na coleção 'users'
       const userDoc = await firestore().collection('users').doc(createdBy).get();
       const userData = userDoc.data();
-      const userToken = 'userData?.fcmToken';
+      const userToken = userData?.fcmToken;
 
       if (!userToken) {
         console.error('Token FCM não encontrado para o usuário');
         return;
       }
-      
+
       const message = {
-        data: {
+        registration_ids: [userToken],
+        notification: {
           title: title,
           body: body,
-        },
-        token: userToken,
-        android: {
+          vibrate: 1,
+          sound: 1,
           priority: 'high',
-          notification: {
-            sound: 'default',
-            vibrate_timings: [100, 500],
-          },
+          show_in_foreground: true,
+          content_available: true,
         },
-        fcmOptions: {},
-        
+        data: {
+          title: 'data_title',
+          body: 'data_body',
+          extra: 'data_extra',
+        },
       };
 
-      // Enviar a mensagem
-      await messaging().sendMessage(message);
+      let headers = new Headers({
+        'Content-Type': 'application/json',
+        Authorization: 'key=' + FIREBASE_SERVER_KEY,
+      });
+    
+      let response = await fetch('https://fcm.googleapis.com/fcm/send', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(message),
+      });
+      response = await response.json();
+      console.log(response);
       
       console.log('Notificação enviada com sucesso!');
     } catch (error) {
@@ -196,7 +219,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
       <BottomSheetModal
         ref={bottomSheetRef}
         index={0}
-        snapPoints={['80%', '50%', '100%']}
+        snapPoints={['60%', '50%', '100%']}
         backdropComponent={BottomSheetBackdrop}
         onDismiss={handleCloseModal}>
         <View style={{padding: 20}}>

@@ -24,7 +24,6 @@ export function Home({ }: HomeProps) {
     setIsModalVisible(false);
   };
 
-
   return (
     <Container>
       <Header />

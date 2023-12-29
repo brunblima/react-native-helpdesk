@@ -8,40 +8,14 @@ import {Routes} from './src/routes';
 import theme from './src/theme';
 
 import notifee, {EventType} from '@notifee/react-native';
-import {messaging} from './src/services/firebaseConfig';
+import messaging from '@react-native-firebase/messaging'
 
 export default function App() {
   
-  useEffect(() => {
-    const requestNotificationPermission = async () => {
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
+  });
   
-      if (enabled) {
-        console.log('Permissão para notificações concedida');
-      } else {
-        console.log('Permissão para notificações negada');
-      }
-    };
-  
-    requestNotificationPermission();
-  
-    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
-      // Trate a notificação recebida em primeiro plano
-      console.log('Notificação em primeiro plano:', remoteMessage);
-    });
-  
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      // Trate a notificação recebida em segundo plano
-      console.log('Notificação em segundo plano:', remoteMessage);
-    });
-  
-    return () => {
-      unsubscribeForeground();
-    };
-  }, []);
   
   useEffect(() => {
     return notifee.onForegroundEvent(({type, detail}) => {

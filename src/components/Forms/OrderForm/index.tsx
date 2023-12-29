@@ -10,7 +10,7 @@ import ImagePicker from '@components/Image';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { FIREBASE_SERVER_KEY } from '../../../services/firebaseConfig'
+import { FIREBASE_SERVER_KEY } from '../../../services/firebaseConfig';
 
 export function OrderForm() {
   const [remoteaccess, setRemoteAccess] = useState('');
@@ -34,6 +34,11 @@ export function OrderForm() {
 
     const user = auth().currentUser;
 
+    // Obter a contagem atual de pedidos
+    const ordersRef = firestore().collection('orders');
+    const querySnapshot = await ordersRef.get();
+    const orderCount = querySnapshot.size; // Contagem atual de pedidos
+
     if (user) {
       const userId = user.uid;
 
@@ -52,6 +57,7 @@ export function OrderForm() {
       firestore()
         .collection('orders')
         .add({
+          ID: orderCount + 1,
           typeService,
           selectedType,
           selectedDevice,

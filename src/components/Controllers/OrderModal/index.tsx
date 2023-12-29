@@ -2,14 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import messaging from '@react-native-firebase/messaging'
+// import messaging from '@react-native-firebase/messaging'
 
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import {View, PermissionsAndroid, Platform, useColorScheme} from 'react-native';
+import {View, PermissionsAndroid} from 'react-native';
 import {OrderProps} from '../Order';
 import {
   Text,
@@ -22,7 +22,7 @@ import {
 } from './styles';
 import Swiper from 'react-native-swiper';
 import {Button} from '../Button';
-import { FIREBASE_SERVER_KEY } from 'src/services/firebaseConfig';
+import { FIREBASE_SERVER_KEY } from '../../../services/firebaseConfig';
 
 export interface OrderModalProps {
   order: OrderProps | null;
@@ -35,22 +35,20 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [currentUserType, setCurrentUserType] = useState('');
   const [actionButtonText, setActionButtonText] = useState<string>('');
-  const [closedAt, setClosedAt] = useState<Date | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
   );
   
+  // function requestAndroidPermission() {
+  //   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+  // }
+  // async function requestUserPermission() {
+  //   const authorizationStatus = await messaging().requestPermission();
   
-  function requestAndroidPermission() {
-    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-  }
-  async function requestUserPermission() {
-    const authorizationStatus = await messaging().requestPermission();
-  
-    if (authorizationStatus) {
-      console.log('Permission status:', authorizationStatus);
-    }
-  }
+  //   if (authorizationStatus) {
+  //     console.log('Permission status:', authorizationStatus);
+  //   }
+  // }
 
   const sendNotification = async (
     createdBy: string,

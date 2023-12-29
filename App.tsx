@@ -16,7 +16,6 @@ export default function App() {
     console.log('Message handled in the background!', remoteMessage);
   });
   
-  
   useEffect(() => {
     return notifee.onForegroundEvent(({type, detail}) => {
       switch (type) {

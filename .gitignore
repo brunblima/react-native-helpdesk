@@ -1,5 +1,5 @@
 #
-/src/services/firebaseConfig.js
+firebaseConfig.js
 # OSX
 #
 .DS_Store

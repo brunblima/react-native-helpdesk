@@ -20,6 +20,6 @@ export const Title = styled.Text`
 `;
 
 export const SubTitle = styled.Text`
-  font-size: 13px;
+  font-size: 16px;
   color: ${({ theme }) => theme.COLORS.SUBTEXT};
 `;

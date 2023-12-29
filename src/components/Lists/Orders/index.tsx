@@ -54,7 +54,7 @@ export function Orders({openModal}: OrdersProps) {
     const user = auth().currentUser;
     if (user && !isAdmin) {
       const userId = user.uid;
-      ordersRef = ordersRef.where('createdBy', '==', userId);
+      ordersRef.where('createdBy', '==', userId);
     }
 
     const subscribe = ordersRef.onSnapshot(querySnapshot => {
@@ -64,9 +64,15 @@ export function Orders({openModal}: OrdersProps) {
       })) as OrderProps[];
 
       const sortedData = data.sort((a, b) => {
-        const dateA = new Date(a.create_at).getTime();
-        const dateB = new Date(b.create_at).getTime();
-        return dateA - dateB;
+        const timestampA = a.create_at?.toDate();
+        const timestampB = b.create_at?.toDate();
+
+        if (timestampA && timestampB) {
+          return timestampB.getTime() - timestampA.getTime();
+        }
+  
+        return 0;
+      
       });
 
       const openOrders = sortedData.filter(order => ['open', 'in_progress'].includes(order.status));

@@ -1,3 +1,4 @@
+/src/services/firebaseConfig.js
 # OSX
 #
 .DS_Store
@@ -65,4 +66,3 @@ yarn-error.log
 # testing
 /coverage
 
-firebaseConfig.js

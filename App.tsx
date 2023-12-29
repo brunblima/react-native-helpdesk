@@ -11,6 +11,17 @@ import notifee, {EventType} from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging'
 
 export default function App() {
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      if (remoteMessage.notification) {
+        const { title, body } = remoteMessage.notification;
+        Alert.alert(title ?? '', body ?? '');
+      }
+    });
+
+    return unsubscribe;
+  }, []);
   
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);

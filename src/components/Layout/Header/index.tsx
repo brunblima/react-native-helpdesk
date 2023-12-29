@@ -23,7 +23,6 @@ export function Header() {
           const userData = doc.data();
           if (userData && userData.username) {
             setUserName(userData.username); // Definindo o nome do usuário para exibição
-            console.log(userName)
           }
         }
       });
@@ -38,7 +37,7 @@ export function Header() {
     <Container>
       <Greeting>
         <Title>Central de Ajuda</Title>
-        <SubTitle>Bem-vindo, {userName}</SubTitle>
+        <SubTitle>Bem-vindo, {userName}!</SubTitle>
       </Greeting>
       <LogoutButton onPress={handleSignOut} />
     </Container>

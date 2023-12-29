@@ -22,6 +22,7 @@ import {
 } from './styles';
 import Swiper from 'react-native-swiper';
 import {Button} from '../Button';
+import { FIREBASE_SERVER_KEY } from 'src/services/firebaseConfig';
 
 export interface OrderModalProps {
   order: OrderProps | null;
@@ -38,8 +39,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
   );
-  const FIREBASE_SERVER_KEY =
-  'AAAAW-_lWzY:APA91bHBW7k6KrtyUkDh0qTU_t8lOk5VrSXIf004EHDUDwsw6faJ0QP6bHvwMQfqen70PbY1S5e57bGIOLUM88V1TDRVgdnwi8Up5GKh77sD5dB_JBwBfreRbpizo-y7kv5QHAL-BxTf';
+  
   
   function requestAndroidPermission() {
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);

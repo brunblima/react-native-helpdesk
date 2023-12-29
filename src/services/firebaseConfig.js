@@ -10,9 +10,12 @@ const firebaseConfig = {
   appId: "1:394866809654:web:0ec87080415d067e3c3197"
 };
 
+const FIREBASE_SERVER_KEY =
+  'AAAAW-_lWzY:APA91bHBW7k6KrtyUkDh0qTU_t8lOk5VrSXIf004EHDUDwsw6faJ0QP6bHvwMQfqen70PbY1S5e57bGIOLUM88V1TDRVgdnwi8Up5GKh77sD5dB_JBwBfreRbpizo-y7kv5QHAL-BxTf';
+
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
 
-export { firebase };
+export { firebase, FIREBASE_SERVER_KEY };

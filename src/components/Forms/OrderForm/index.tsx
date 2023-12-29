@@ -10,6 +10,7 @@ import ImagePicker from '@components/Image';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { FIREBASE_SERVER_KEY } from '../../../services/firebaseConfig'
 
 export function OrderForm() {
   const [remoteaccess, setRemoteAccess] = useState('');
@@ -27,7 +28,7 @@ export function OrderForm() {
   const [sectors, setSectors] = useState<string[]>([]);
   const [typeService, setTypeService] = useState('');
   const [type, setType] = useState<string[]>([]);
-
+  
   const handleNewOrder = async () => {
     setIsLoading(true);
 
@@ -67,7 +68,69 @@ export function OrderForm() {
         .catch(error => console.log(error))
         .finally(() => setIsLoading(false));
     }
+    await sendAdminNotification(
+      'Novo Chamado',
+      'Um novo chamado foi aberto.'
+    );
+      
   };
+  const sendAdminNotification = async (
+    title: string,
+    body: string,
+  ) => {
+    try {
+      const adminUsersSnapshot = await firestore()
+        .collection('users')
+        .where('userType', '==', 'admin')
+        .get();
+  
+      adminUsersSnapshot.forEach(async adminUserDoc => {
+        const adminUserData = adminUserDoc.data();
+        const adminUserToken = adminUserData?.fcmToken;
+  
+        if (adminUserToken) {
+          const message = {
+            registration_ids: [adminUserToken],
+            notification: {
+              title: title,
+              body: body,
+              vibrate: 1,
+              sound: 1,
+              priority: 'high',
+              show_in_foreground: true,
+              content_available: true,
+            },
+            data: {
+              title: 'data_title',
+              body: 'data_body',
+              extra: 'data_extra',
+            },
+          };
+  
+          let headers = new Headers({
+            'Content-Type': 'application/json',
+            Authorization: 'key=' + FIREBASE_SERVER_KEY,
+          });
+        
+          let response = await fetch('https://fcm.googleapis.com/fcm/send', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(message),
+          });
+          response = await response.json();
+          console.log(response);
+          
+          console.log('Notificação enviada para o administrador:', adminUserData.email);
+        }
+      });
+  
+      console.log('Notificações enviadas para os administradores com sucesso!');
+    } catch (error) {
+      console.error('Erro ao enviar notificações para os administradores:', error);
+    }
+  };
+  
+
 
   const getDeviceTypeData = async () => {
     const deviceTypeCollection = firestore().collection('deviceType');

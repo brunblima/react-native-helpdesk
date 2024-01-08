@@ -7,6 +7,7 @@ import {Form, Title} from './styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 
 export function AccountForm() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,16 @@ export function AccountForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function handleNewAccount() {
+    if (!username || !email || !password || !confirmPassword) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem.');
+      return;
+    }
+
     setIsLoading(true);
     auth()
       .createUserWithEmailAndPassword(email, password)
@@ -26,11 +37,15 @@ export function AccountForm() {
         const currentUser = userCredential.user;
 
         if (currentUser) {
+          await messaging().registerDeviceForRemoteMessages();
+          const token = await messaging().getToken();
           await firestore().collection('users').doc(currentUser.uid).set({
             email,
             username,
             userType,
+            token,
           });
+          
           Alert.alert('Conta', 'Cadastrado com Sucesso');
         } else {
           Alert.alert('Erro', 'Não foi possível criar a conta');

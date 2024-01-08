@@ -75,6 +75,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
           priority: 'high',
           show_in_foreground: true,
           content_available: true,
+          icon: 'ic_launcher', 
         },
         data: {
           title: 'data_title',

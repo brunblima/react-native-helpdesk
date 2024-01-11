@@ -61,17 +61,21 @@ export const NewPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const toggleCurrentPasswordVisibility = () => {
+    setShowCurrentPassword(!showCurrentPassword);
+  };
+
   return (
     <View>
 
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Input
           placeholder="Senha Atual"
-          secureTextEntry={!showPassword}
+          secureTextEntry={!showCurrentPassword}
           onChangeText={text => setCurrentPassword(text)}
         />
         <TouchableOpacity
-          onPress={togglePasswordVisibility}
+          onPress={toggleCurrentPasswordVisibility}
           style={{position: 'absolute', right: 15, top: 16}}>
           <MaterialIcons
             name={showPassword ? 'visibility-off' : 'visibility'}

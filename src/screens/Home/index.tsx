@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Container } from './styles';
-import { Header } from '../../components/Layout/Header';
-import { Orders } from '../../components/Lists/Orders';
-import { NewOrder } from '../../components/Controllers/NewOrder';
-import OrderModal, { OrderModalProps } from '../../components/Controllers/OrderModal';
-import { OrderProps } from '@components/Controllers/Order';
+import React, {useState, useEffect} from 'react';
+import {Container} from './styles';
+import {Header} from '../../components/Layout/Header';
+import {Orders} from '../../components/Lists/Orders';
+import {NewOrder} from '../../components/Controllers/NewOrder';
+import OrderModal from '../../components/Controllers/OrderModal';
+import {OrderProps} from '@components/Controllers/Order';
 
 interface HomeProps {
   openModal: (order: OrderProps | null) => void;
 }
 
-export function Home({ }: HomeProps) {
+export function Home() {
   const [selectedOrder, setSelectedOrder] = useState<OrderProps | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -30,7 +30,10 @@ export function Home({ }: HomeProps) {
       <Orders openModal={handleOpenModal} />
       <NewOrder />
       {isModalVisible && (
-        <OrderModal order={selectedOrder} setIsModalVisible={handleCloseModal} />
+        <OrderModal
+          order={selectedOrder}
+          setIsModalVisible={handleCloseModal}
+        />
       )}
     </Container>
   );

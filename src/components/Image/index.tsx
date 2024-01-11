@@ -1,6 +1,4 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, Text} from 'react-native';
-import styled from 'styled-components/native';
 import {
   launchCamera,
   launchImageLibrary,
@@ -21,7 +19,7 @@ import {
 
 interface ImagePickerProps {
     onSelectImage: (imageUri: string) => void;
-    onRemoveImage: (imageUri: string) => void; // Função para remover uma imagem
+    onRemoveImage: (imageUri: string) => void; 
   }
 const ImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveImage}) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);

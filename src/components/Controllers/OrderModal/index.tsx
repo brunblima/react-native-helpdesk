@@ -228,9 +228,10 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         enableContentPanningGesture={false}
         ref={bottomSheetRef}
         index={0}
-        snapPoints={['100%']}
+        snapPoints={['98%']}
         backdropComponent={BottomSheetBackdrop}
-        onDismiss={handleCloseModal}>
+        onDismiss={handleCloseModal}
+        >  
         <ScrollView>
           <View style={{padding: 20}}>
             {selectedOrder && (
@@ -238,6 +239,11 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={{fontWeight: 'bold'}}>Status: </Text>
                   <Text>{statusTranslation[selectedOrder.status]}</Text>
+                </View>
+
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>Setor: </Text>
+                  <Text>{selectedOrder.selectedSector}</Text>
                 </View>
 
                 {selectedOrder.selectedType !== '' && (
@@ -249,10 +255,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
                   </View>
                 )}
 
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontWeight: 'bold'}}>Setor: </Text>
-                  <Text>{selectedOrder.selectedSector}</Text>
-                </View>
+                
 
                 {selectedOrder.selectedDevice !== '' && (
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>

@@ -217,7 +217,7 @@ const Profile = () => {
         <BottomSheetModal
           enableContentPanningGesture={false}
           ref={bottomSheetRef}
-          snapPoints={['50%']}
+          snapPoints={['50%', '65%']}
           style={{padding: 24}}
           enablePanDownToClose={true}
           backdropComponent={() => <Background />}>

@@ -6,7 +6,7 @@ export type OrderStyleProps = {
 
 export const Container = styled.TouchableOpacity`
   width: 100%;
-  height: 150px;
+  height: 180px;
   flex-direction: row;
   overflow: hidden;
   margin-bottom: 16px;
@@ -14,12 +14,12 @@ export const Container = styled.TouchableOpacity`
 
 export const Content = styled.View`
   width: 100%;
-  height: 150px;
   padding: 5px 10px;
   justify-content: flex-start;
   align-items: flex-start;
   background-color: ${({ theme }) => theme.COLORS.WHITE};
   border-radius: 0 20px 20px 0;
+  flex-grow: 1;
 `;
 
 export const Header = styled.View`
@@ -29,7 +29,7 @@ export const Header = styled.View`
 
 export const Status = styled.View<OrderStyleProps>`
   width: 10px;
-  height: 150px;
+  height: 180px;
   background-color: ${({ theme, status }) => {
     switch (status) {
       case 'open':

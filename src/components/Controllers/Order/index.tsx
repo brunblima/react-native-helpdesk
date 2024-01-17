@@ -178,8 +178,9 @@ export function Order({data, onOrderPress}: Props) {
         )}
 
         <Body style={{padding: 3}}>
-          <Title>{data.description}</Title>
+          <Title numberOfLines={2}>{data.description}</Title>
         </Body>
+        
         <Footer>
           <Info>
             <MaterialIcons

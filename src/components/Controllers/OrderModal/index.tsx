@@ -1,15 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-// import messaging from '@react-native-firebase/messaging'
-
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import {View, PermissionsAndroid} from 'react-native';
+import {View, Alert, ScrollView} from 'react-native';
 import {OrderProps} from '../Order';
 import {
   Text,
@@ -22,8 +19,9 @@ import {
 } from './styles';
 import Swiper from 'react-native-swiper';
 import {Button} from '../Button';
-import { FIREBASE_SERVER_KEY } from '../../../services/firebaseConfig';
-
+import {FIREBASE_SERVER_KEY} from '../../../services/firebaseConfig';
+import {Input} from '../Input';
+import Modal from 'react-native-modal';
 export interface OrderModalProps {
   order: OrderProps | null;
   setIsModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,17 +36,9 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
   );
-  
-  // function requestAndroidPermission() {
-  //   PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-  // }
-  // async function requestUserPermission() {
-  //   const authorizationStatus = await messaging().requestPermission();
-  
-  //   if (authorizationStatus) {
-  //     console.log('Permission status:', authorizationStatus);
-  //   }
-  // }
+  const [solution, setSolution] = useState<string>('');
+  const [isConfirmationModalVisible, setConfirmationModalVisible] =
+    useState(false);
 
   const sendNotification = async (
     createdBy: string,
@@ -56,7 +46,10 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
     body: string,
   ) => {
     try {
-      const userDoc = await firestore().collection('users').doc(createdBy).get();
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(createdBy)
+        .get();
       const userData = userDoc.data();
       const userToken = userData?.fcmToken;
 
@@ -75,7 +68,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
           priority: 'high',
           show_in_foreground: true,
           content_available: true,
-          icon: 'ic_launcher', 
+          icon: 'ic_launcher',
         },
         data: {
           title: 'data_title',
@@ -88,7 +81,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         'Content-Type': 'application/json',
         Authorization: 'key=' + FIREBASE_SERVER_KEY,
       });
-    
+
       let response = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
         headers,
@@ -96,7 +89,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
       });
       response = await response.json();
       console.log(response);
-      
+
       console.log('Notificação enviada com sucesso!');
     } catch (error) {
       console.error('Erro ao enviar a notificação:', error);
@@ -134,16 +127,31 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
     }
   };
 
-  const handleCloseOrder = async () => {
+  const handleConfirmCloseOrder = () => {
+    if (selectedOrder?.status === 'in_progress' && solution.length < 10) {
+      Alert.alert('Erro', 'A solução deve ter pelo menos 10 caracteres.');
+      return;
+    }
+    setConfirmationModalVisible(true);
+  };
+
+  const handleCloseOrder = async (solution: string) => {
     setIsLoading(true);
 
     try {
+      if (selectedOrder?.status === 'in_progress' && solution.length < 10) {
+        setIsLoading(false);
+        Alert.alert('Erro', 'A solução deve ter pelo menos 10 caracteres.');
+        return;
+      }
+
       const now = new Date();
 
       await firestore()
         .collection('orders')
         .doc(selectedOrder?.id)
-        .update({status: 'closed', closed_at: now});
+        .update({status: 'closed', closed_at: now, solution: solution});
+
       handleCloseModal();
       setIsLoading(false);
       updateButtonStatus('closed');
@@ -152,6 +160,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         'Chamado Encerrado',
         'O chamado foi encerrado.',
       );
+      setConfirmationModalVisible(false);
     } catch (error) {
       setIsLoading(false);
       console.error('Erro ao processar ação:', error);
@@ -162,7 +171,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
     if (selectedOrder?.status === 'open') {
       handleAcceptOrder();
     } else if (selectedOrder?.status === 'in_progress') {
-      handleCloseOrder();
+      handleConfirmCloseOrder();
     }
   };
 
@@ -194,7 +203,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
       updateButtonStatus(order.status);
     }
   }, [order]);
-  
+
   useEffect(() => {
     const user = auth().currentUser;
     if (user) {
@@ -216,132 +225,178 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
+        enableContentPanningGesture={false}
         ref={bottomSheetRef}
         index={0}
-        snapPoints={['60%', '50%', '100%']}
+        snapPoints={['100%']}
         backdropComponent={BottomSheetBackdrop}
         onDismiss={handleCloseModal}>
-        <View style={{padding: 20}}>
-          {selectedOrder && (
-            <>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontWeight: 'bold'}}>Status: </Text>
-                <Text>{statusTranslation[selectedOrder.status]}</Text>
-              </View>
-
-              {selectedOrder.selectedType !== '' && (
+        <ScrollView>
+          <View style={{padding: 20}}>
+            {selectedOrder && (
+              <>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontWeight: 'bold'}}>
-                    Tipo do Dispositivo:{' '}
+                  <Text style={{fontWeight: 'bold'}}>Status: </Text>
+                  <Text>{statusTranslation[selectedOrder.status]}</Text>
+                </View>
+
+                {selectedOrder.selectedType !== '' && (
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={{fontWeight: 'bold'}}>
+                      Tipo do Dispositivo:{' '}
+                    </Text>
+                    <Text>{selectedOrder.selectedType}</Text>
+                  </View>
+                )}
+
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>Setor: </Text>
+                  <Text>{selectedOrder.selectedSector}</Text>
+                </View>
+
+                {selectedOrder.selectedDevice !== '' && (
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={{fontWeight: 'bold'}}>Dispositivo: </Text>
+                    <Text>{selectedOrder.selectedDevice}</Text>
+                  </View>
+                )}
+
+                {selectedOrder.remoteaccess !== '' && (
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={{fontWeight: 'bold'}}>Acesso Remoto: </Text>
+                    <Text>{selectedOrder.remoteaccess}</Text>
+                  </View>
+                )}
+
+                <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                  <Text style={{fontWeight: 'bold'}}>Descrição: </Text>
+
+                  <View style={{flex: 1}}>
+                    <Text style={{flexWrap: 'wrap'}}>
+                      {selectedOrder.description}
+                    </Text>
+                  </View>
+                </View>
+
+                {selectedOrder.selectedType !== '' && (
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={{fontWeight: 'bold'}}>Local: </Text>
+                    <Text>{selectedOrder.location}</Text>
+                  </View>
+                )}
+
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{fontWeight: 'bold'}}>Aberto em: </Text>
+                  <Text>
+                    {new Date(
+                      selectedOrder.create_at._seconds * 1000,
+                    ).toLocaleString()}
                   </Text>
-                  <Text>{selectedOrder.selectedType}</Text>
                 </View>
-              )}
 
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontWeight: 'bold'}}>Setor: </Text>
-                <Text>{selectedOrder.selectedSector}</Text>
-              </View>
-
-              {selectedOrder.selectedDevice !== '' && (
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontWeight: 'bold'}}>Dispositivo: </Text>
-                  <Text>{selectedOrder.selectedDevice}</Text>
-                </View>
-              )}
-
-              {selectedOrder.remoteaccess !== '' && (
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontWeight: 'bold'}}>Acesso Remoto: </Text>
-                  <Text>{selectedOrder.remoteaccess}</Text>
-                </View>
-              )}
-
-              <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
-                <Text style={{fontWeight: 'bold'}}>Descrição: </Text>
-
-                <View style={{flex: 1}}>
-                  <Text style={{flexWrap: 'wrap'}}>
-                    {selectedOrder.description}
+                  <Text style={{fontWeight: 'bold'}}>Encerrado em: </Text>
+                  <Text>
+                    {selectedOrder.closed_at
+                      ? new Date(
+                          selectedOrder.closed_at._seconds * 1000,
+                        ).toLocaleString()
+                      : 'Não encerrado ainda'}
                   </Text>
                 </View>
-              </View>
 
-              {selectedOrder.selectedType !== '' && (
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{fontWeight: 'bold'}}>Local: </Text>
-                  <Text>{selectedOrder.location}</Text>
-                </View>
-              )}
-
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontWeight: 'bold'}}>Aberto em: </Text>
-                <Text>
-                  {new Date(
-                    selectedOrder.create_at._seconds * 1000,
-                  ).toLocaleString()}
+                <Text style={{fontSize: 16, fontWeight: 'bold', marginTop: 20, marginBottom: 15}}>
+                  Imagens anexadas
                 </Text>
-              </View>
+                <ModalContainer>
+                  {order?.images.map((image, index) => (
+                    <ImageThumbnail
+                      key={index}
+                      onPress={() => openImageFullSize(index)}>
+                      <ThumbnailImage source={{uri: image}} />
+                    </ImageThumbnail>
+                  ))}
+                  <FullScreenModal
+                    visible={selectedImageIndex !== null}
+                    transparent={true}
+                    onRequestClose={closeImageFullSize}>
+                    <FullScreenView>
+                      <Swiper
+                        style={{height: '100%'}}
+                        index={selectedImageIndex || 0}
+                        loop={false}
+                        onIndexChanged={index => setSelectedImageIndex(index)}>
+                        {order?.images.map((image, index) => (
+                          <View key={index}>
+                            <FullScreenImage
+                              source={{uri: image}}
+                              resizeMode="contain"
+                              style={{width: '100%', height: '100%'}}
+                            />
+                          </View>
+                        ))}
+                      </Swiper>
+                    </FullScreenView>
+                  </FullScreenModal>
+                </ModalContainer>
 
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontWeight: 'bold'}}>Encerrado em: </Text>
-                <Text>
-                  {selectedOrder.closed_at
-                    ? new Date(
-                        selectedOrder.closed_at._seconds * 1000,
-                      ).toLocaleString()
-                    : 'Não encerrado ainda'}
-                </Text>
-              </View>
+                {selectedOrder?.status !== 'open' && (
+                  <View style={{alignItems: 'flex-start', marginTop: 20}}>
+                    <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                      Resolução:{' '}
+                    </Text>
 
-              <Text style={{fontSize: 16, fontWeight: 'bold', marginTop: 20}}>
-                Imagens anexadas
-              </Text>
-              <ModalContainer>
-                {order?.images.map((image, index) => (
-                  <ImageThumbnail
-                    key={index}
-                    onPress={() => openImageFullSize(index)}>
-                    <ThumbnailImage source={{uri: image}} />
-                  </ImageThumbnail>
-                ))}
-                <FullScreenModal
-                  visible={selectedImageIndex !== null}
-                  transparent={true}
-                  onRequestClose={closeImageFullSize}>
-                  <FullScreenView>
-                    <Swiper
-                      style={{height: '100%'}}
-                      index={selectedImageIndex || 0}
-                      loop={false}
-                      onIndexChanged={index => setSelectedImageIndex(index)}>
-                      {order?.images.map((image, index) => (
-                        <View key={index}>
-                          <FullScreenImage
-                            source={{uri: image}}
-                            resizeMode="contain"
-                            style={{width: '100%', height: '100%'}}
-                          />
-                        </View>
-                      ))}
-                    </Swiper>
-                  </FullScreenView>
-                </FullScreenModal>
-              </ModalContainer>
+                    <View style={{flex: 1}}>
+                      <Text style={{flexWrap: 'wrap', fontSize: 16}}>
+                        {selectedOrder.solution}
+                      </Text>
+                    </View>
+                  </View>
+                )}
 
-              {isAdmin && (
-                <View style={{marginTop: '40%'}}>
-                  <Button
-                    title={actionButtonText}
-                    isLoading={isLoading}
-                    onPress={handleActionBasedOnStatus}
-                  />
+                <View style={{marginBottom: '30%'}}>
+                  {isAdmin && selectedOrder?.status === 'in_progress' && (
+                    <Input
+                      placeholder="Digite a solução..."
+                      style={{width: '100%', height: 100, textAlign: 'auto', textAlignVertical: 'top', paddingTop: 20}}
+                      value={solution}
+                      onChangeText={text => setSolution(text)}
+                    />
+                  )}
+
+                  {isAdmin && selectedOrder?.status !== 'closed' && (
+                    <View>
+                      <Button
+                        title={actionButtonText}
+                        isLoading={isLoading}
+                        onPress={handleActionBasedOnStatus}
+                      />
+                    </View>
+                  )}
                 </View>
-              )}
-            </>
-          )}
-        </View>
+              </>
+            )}
+          </View>
+        </ScrollView>
       </BottomSheetModal>
+
+      <Modal isVisible={isConfirmationModalVisible}>
+        <View style={{backgroundColor: 'white', padding: 20, borderRadius: 20}}>
+          <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 10}}>
+            Confirma o fechamento do chamado?
+          </Text>
+          <Button
+            style={{width: '100%', height: 50, marginBottom: 10}}
+            title="Confirmar"
+            onPress={() => handleCloseOrder(solution)}
+          />
+          <Button
+            style={{width: '100%', height: 50, backgroundColor: '#FF366A'}}
+            title="Cancelar"
+            onPress={() => setConfirmationModalVisible(false)}
+          />
+        </View>
+      </Modal>
     </BottomSheetModalProvider>
   );
 };

@@ -1,12 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useTheme } from '@react-navigation/native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
 
 import { Home } from '../../../screens/Home';
-import Profile  from '../../../screens/Profile'; // Você precisa importar a tela do perfil ou qualquer outra tela que deseje adicionar
+import {ProfileScreen}  from '../../../screens/Profile';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -35,8 +34,7 @@ export function MainApp() {
       })}
     >
       <Tab.Screen name="Inicio" component={HomeStackScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Perfil" component={Profile} options={{ headerShown: false }}  />
-      {/* Adicione mais telas conforme necessário */}
+      <Tab.Screen name="Perfil" component={ProfileScreen} options={{ headerShown: false }}  />
     </Tab.Navigator>
   );
 }
@@ -45,7 +43,6 @@ function HomeStackScreen() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={Home} />
-      {/* Adicione mais telas Stack.Screen conforme necessário */}
     </Stack.Navigator>
   );
 }

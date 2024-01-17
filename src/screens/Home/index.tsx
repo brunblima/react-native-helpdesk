@@ -1,14 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {Container} from './styles';
 import {Header} from '../../components/Layout/Header';
 import {Orders} from '../../components/Lists/Orders';
 import {NewOrder} from '../../components/Controllers/NewOrder';
 import OrderModal from '../../components/Controllers/OrderModal';
 import {OrderProps} from '@components/Controllers/Order';
-
-interface HomeProps {
-  openModal: (order: OrderProps | null) => void;
-}
 
 export function Home() {
   const [selectedOrder, setSelectedOrder] = useState<OrderProps | null>(null);

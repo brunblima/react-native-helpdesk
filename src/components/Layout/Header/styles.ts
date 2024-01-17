@@ -3,7 +3,6 @@ import styled from 'styled-components/native';
 export const Container = styled.View`
   width: 100%;
   flex-direction: row;
-  justify-content: space-between;
 `;
 
 export const Greeting = styled.View`
@@ -22,4 +21,5 @@ export const Title = styled.Text`
 export const SubTitle = styled.Text`
   font-size: 16px;
   color: ${({ theme }) => theme.COLORS.SUBTEXT};
+  padding-left: 10px;
 `;

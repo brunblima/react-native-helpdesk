@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Alert} from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {LogoutButton} from '../../Controllers/LogoutButton';
@@ -34,9 +35,30 @@ export function Header() {
     return () => clearInterval(interval);
   }, []);
 
-  function handleSignOut() {
-    auth().signOut();
-  }
+  function handleSignOut()  {
+    Alert.alert(
+      'Logout',
+      'Tem certeza que deseja fazer logout?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmar',
+          onPress: async () => {
+            try {
+              await auth().signOut();
+              console.log('Usuário desconectado com sucesso.');
+            } catch (error) {
+              console.error('Erro ao fazer logout:', error);
+            }
+          },
+        },
+      ],
+    );
+  };
+  
 
   return (
     <Container>

@@ -35,6 +35,7 @@ export interface OrderProps {
   images: string[];
   createdBy: string;
   userId: string;
+  solution: string;
 }
 
 type Props = {

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 
-import firestore from '@react-native-firebase/firestore';
+import firestore, { FirebaseFirestoreTypes }  from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
 import {Load} from '../../../components/Animations/Load';
@@ -54,9 +54,8 @@ export function Orders({openModal}: OrdersProps) {
     const user = auth().currentUser;
     if (user && !isAdmin) {
       const userId = user.uid;
-      ordersRef.where('createdBy', '==', userId);
+      ordersRef = ordersRef.where('createdBy', '==', userId) as FirebaseFirestoreTypes.CollectionReference<FirebaseFirestoreTypes.DocumentData>;
     }
-
     const subscribe = ordersRef.onSnapshot(querySnapshot => {
       const data = querySnapshot.docs.map(doc => ({
         id: doc.id,

@@ -24,15 +24,7 @@ export function SignInForm() {
     const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
   }
-  async function doesEmailExist(email: string) {
-    try {
-      const methods = await auth().fetchSignInMethodsForEmail(email);
-      return methods.length > 0;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  }
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -65,28 +57,19 @@ export function SignInForm() {
       setIsLoading(false);
     }
   }
-
-  function handleForgotPassword() {
-    if (isEmailValid(email)) {
-      doesEmailExist(email)
-        .then(emailExists => {
-          if (emailExists) {
-            auth()
-              .sendPasswordResetEmail(email)
-              .then(() =>
-                Alert.alert('Redefinir Senha', 'Enviamos um e-mail para você'),
-              )
-              .catch(error => console.log(error));
-          } else {
-            Alert.alert(
-              'E-mail não encontrado',
-              'Digite um e-mail válido ou registre-se.',
-            );
-          }
-        })
-        .catch(error => console.log(error));
-    } else {
-      Alert.alert('E-mail Inválido', 'Digite um e-mail válido');
+  
+  async function handleForgotPassword() {
+    try {
+      if (!isEmailValid(email)) {
+        Alert.alert('E-mail Inválido', 'Digite um e-mail válido');
+        return;
+      }
+  
+      await auth().sendPasswordResetEmail(email);
+      Alert.alert('Redefinir Senha', 'Enviamos um e-mail para você');
+    } catch (error) {
+      console.error('Erro ao redefinir senha:', error);
+      Alert.alert('Erro ao redefinir senha', 'Por favor, tente novamente mais tarde');
     }
   }
 

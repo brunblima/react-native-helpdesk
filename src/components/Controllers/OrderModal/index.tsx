@@ -21,6 +21,7 @@ import Swiper from 'react-native-swiper';
 import {Button} from '../Button';
 import {FIREBASE_SERVER_KEY} from '../../../services/firebaseConfig';
 import {Input} from '../Input';
+import {TextArea} from '../TextArea';
 import Modal from 'react-native-modal';
 export interface OrderModalProps {
   order: OrderProps | null;
@@ -230,8 +231,7 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
         index={0}
         snapPoints={['98%']}
         backdropComponent={BottomSheetBackdrop}
-        onDismiss={handleCloseModal}
-        >  
+        onDismiss={handleCloseModal}>
         <ScrollView>
           <View style={{padding: 20}}>
             {selectedOrder && (
@@ -254,8 +254,6 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
                     <Text>{selectedOrder.selectedType}</Text>
                   </View>
                 )}
-
-                
 
                 {selectedOrder.selectedDevice !== '' && (
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -308,7 +306,13 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
                   </Text>
                 </View>
 
-                <Text style={{fontSize: 16, fontWeight: 'bold', marginTop: 20, marginBottom: 15}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    marginTop: 20,
+                    marginBottom: 15,
+                  }}>
                   Imagens anexadas
                 </Text>
                 <ModalContainer>
@@ -359,9 +363,8 @@ const OrderModal: React.FC<OrderModalProps> = ({order, setIsModalVisible}) => {
 
                 <View style={{marginBottom: '30%'}}>
                   {isAdmin && selectedOrder?.status === 'in_progress' && (
-                    <Input
+                    <TextArea
                       placeholder="Digite a solução..."
-                      style={{width: '100%', height: 100, textAlign: 'auto', textAlignVertical: 'top', paddingTop: 20}}
                       value={solution}
                       onChangeText={text => setSolution(text)}
                     />

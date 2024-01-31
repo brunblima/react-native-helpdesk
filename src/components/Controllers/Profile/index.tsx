@@ -11,8 +11,9 @@ import storage from '@react-native-firebase/storage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Button} from '../Button';
 import {NewPassword} from '@components/Controllers/NewPassword';
-import { Header } from '@components/Layout/Header';
-import  Footer  from '@components/Controllers/Footer';
+import {Header} from '@components/Layout/Header';
+import Footer from '@components/Controllers/Footer';
+import About from '@components/Controllers/About';
 
 import {Background, Container} from './styles';
 import {
@@ -20,7 +21,6 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import { SpaceBetween } from '@components/Image/styles';
 
 const defaultAvatar = require('@assets/images/defaultAvatar.png');
 
@@ -76,7 +76,7 @@ const Profile = () => {
                 }
 
                 setAvatarSource({uri: selectedImage.uri});
-                Alert.alert('Imagem atualizada com sucesso')
+                Alert.alert('Imagem atualizada com sucesso');
               })
               .catch(error => {
                 console.error('Error uploading image:', error);
@@ -103,7 +103,7 @@ const Profile = () => {
         .update({
           avatarUrl: null,
         });
-      Alert.alert('Imagem Removida com Sucesso')  
+      Alert.alert('Imagem Removida com Sucesso');
       setAvatarSource(defaultAvatar);
       imageOptionsBottomSheetRef.current?.dismiss();
     } catch (error) {
@@ -134,7 +134,7 @@ const Profile = () => {
   }, []);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  
+
   const imageOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
 
   function handleSnapPress() {
@@ -147,7 +147,7 @@ const Profile = () => {
 
   return (
     <Container>
-      <Header/>
+      <Header />
       <View style={{alignItems: 'center', paddingTop: 20}}>
         {renderAvatar()}
         <Text
@@ -163,17 +163,18 @@ const Profile = () => {
 
       <View style={{alignItems: 'center', margin: 15, paddingTop: 20}}>
         <Button
-          style={{width: '100%'}}
+          style={{width: '100%', marginBottom: 10}}
           title="Alterar senha"
           onPress={handleSnapPress}
         />
+
+        <About />
       </View>
-      
-      <View style={{flex: 1, justifyContent: 'flex-end'}}>       
-      <Footer/>
+
+      <View style={{flex: 1, justifyContent: 'flex-end'}}>
+        <Footer />
       </View>
-      
-      
+
       <BottomSheetModalProvider>
         <BottomSheetModal
           enableContentPanningGesture={false}
@@ -183,7 +184,6 @@ const Profile = () => {
           enablePanDownToClose={true}
           backdropComponent={() => <Background />}>
           <BottomSheetView>
-
             <View>
               <Text style={{color: '#000', fontSize: 24}}>Foto de perfil</Text>
             </View>
@@ -208,7 +208,6 @@ const Profile = () => {
                 <Text style={{color: '#000'}}>Remover</Text>
               </TouchableOpacity>
             </View>
-
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
@@ -226,8 +225,6 @@ const Profile = () => {
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
-
-      
     </Container>
   );
 };
